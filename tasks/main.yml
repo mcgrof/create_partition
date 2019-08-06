@@ -78,16 +78,6 @@
   register: create_data_fs
   tags: [ 'partition' ]
 
-- name: Ensure directory {{ disk_setup_path }} is created and with correct permissions
-  become: yes
-  become_method: sudo
-  file:
-    state: directory
-    path: "{{ disk_setup_path }}"
-    owner: "{{ disk_setup_user }}"
-    group: "{{ disk_setup_group }}"
-  tags: [ 'partition' ]
-
 - name: Mount data filesystem iff {{ disk_setup_path }} is not mounted
   become: yes
   become_flags: 'su - -c'
@@ -100,6 +90,8 @@
   when: >
     label_grep.rc == 0 or
     (create_data_fs is success and
+     part_mounts_item is not defined) or
+    (create_data_fs is success and
     part_mounts_item is defined and
     part_mounts_item | length <= 1 or
     part_mounts_item[1] is not defined) or
@@ -109,4 +101,14 @@
     (part_mounts_item is defined and
     part_mounts_item | length <= 1 or
     part_mounts_item[1] is not defined)
+  tags: [ 'partition' ]
+
+- name: Ensure directory {{ disk_setup_path }} is created and with correct permissions
+  become: yes
+  become_method: sudo
+  file:
+    state: directory
+    path: "{{ disk_setup_path }}"
+    owner: "{{ disk_setup_user }}"
+    group: "{{ disk_setup_group }}"
   tags: [ 'partition' ]

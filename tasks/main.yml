@@ -1,15 +1,4 @@
 ---
-- name: Sanity check on input variables
-  assert:
-    that:
-      - disk_setup_device is defined
-      - disk_setup_fstype is defined
-      - disk_setup_label is defined
-      - disk_setup_fs_opts is defined
-      - disk_setup_path is defined
-      - disk_setup_user is defined
-      - disk_setup_group is defined
-
 - name: Check if {{ disk_setup_path }} is mounted
   become: yes
   become_method: sudo

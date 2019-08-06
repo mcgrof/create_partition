@@ -11,19 +11,27 @@
 - name: Check if {{ disk_setup_path }} is present on /etc/fstab
   become: yes
   become_method: sudo
-  shell: awk '{print $2}' /etc/fstab  | grep -q ^"{{ disk_setup_path }}"
+  shell: |
+    set -o pipefail
+    awk '{print $2}' /etc/fstab  | grep -q ^"{{ disk_setup_path }}"
   register: fstab_grep_stat
   failed_when: False
   changed_when: False
+  args:
+    executable: /bin/bash
   tags: [ 'partition' ]
 
 - name: partitions | Read all partitions labels and see if they match {{ disk_setup_label }}
   become: yes
   become_method: sudo
-  shell: find /dev -type b | xargs lsblk -npr -oLABEL | grep -q ^"{{ disk_setup_label }}"
+  shell: |
+    set -o pipefail
+    find /dev -type b | xargs lsblk -npr -oLABEL | grep -q ^"{{ disk_setup_label }}"
   register: label_grep
   failed_when: False
   changed_when: False
+  args:
+    executable: /bin/bash
   tags: [ 'partition' ]
 
 - name: partitions | check if block {{ disk_setup_device }} exists
@@ -38,16 +46,21 @@
   tags: [ 'partition' ]
 
 - name: partitions | Read {{ disk_setup_device }} partitions and mountpoints
-  shell: lsblk -npr -oNAME,MOUNTPOINT {{ disk_setup_device }}
+  shell: |
+    set -o pipefail
+    lsblk -npr -oNAME,MOUNTPOINT {{ disk_setup_device }}
   register: result
   when: >
     stat_result is success and
     stat_result.stat is defined and
     stat_result.stat.isblk is defined and
-    stat_result.stat.isblk == True
+    stat_result.stat.isblk
+  args:
+    executable: /bin/bash
   tags: [ 'partition' ]
 
-- set_fact:
+- name: paritions | collect partition information onto part_mounts
+  set_fact:
     part_mounts: |
       {%- set x = [] -%}
       {%- for line in result.stdout_lines -%}

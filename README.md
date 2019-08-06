@@ -23,6 +23,7 @@ Role Variables
 
   * disk_setup_device: the target device to use
   * disk_setup_fstype: the filesystem type to use
+  * disk_setup_mount_opts: extra mount options to use for /etc/fstab
   * disk_setup_label: the filesystem label to use
   * disk_setup_fs_opts: additional filesystem options to pass
   * disk_setup_path: the path to mount the filesystem

@@ -99,6 +99,7 @@
     path: "{{ disk_setup_path }}"
     src: LABEL="{{ disk_setup_label }}"
     fstype: "{{ disk_setup_fstype }}"
+    opts: "{{ disk_setup_mount_opts }}"
     state: mounted
   when: >
     label_grep.rc == 0 or

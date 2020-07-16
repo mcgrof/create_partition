@@ -1,4 +1,15 @@
 ---
+- name: Import optional extra_args file
+  include_vars: "{{ item }}"
+  ignore_errors: yes
+  with_first_found:
+    - files:
+      - "../extra_vars.yml"
+      - "../extra_vars.yaml"
+      - "../extra_vars.json"
+      skip: true
+  tags: vars
+
 - name: Check if {{ disk_setup_path }} is mounted
   become: yes
   become_method: sudo
